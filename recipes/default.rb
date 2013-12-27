@@ -28,9 +28,15 @@ remote_file ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["p
   action :create_if_missing
 end
 
-package ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["package_file"]) do
-  provider node["elasticsearch"]["package_provider"]
-  action :install
+case node["platform_family"]
+when "debian", "ubuntu"
+  dpkg_package ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["package_file"]) do
+    action :install
+  end
+when "suse"
+  package ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["package_file"]) do
+    action :install
+  end
 end
 
 template node["elasticsearch"]["sysconfig_file"] do
@@ -45,8 +51,8 @@ template node["elasticsearch"]["sysconfig_file"] do
 
   notifies :restart, "service[elasticsearch]"
   
-  only_if do
-    node["elasticsearch"]["sysconfig_file"]
+  not_if do
+    node["elasticsearch"]["sysconfig_file"].empty?
   end
 end
 
@@ -61,6 +67,10 @@ template node["elasticsearch"]["config_file"] do
   )
 
   notifies :restart, "service[elasticsearch]"
+  
+  not_if do
+    node["elasticsearch"]["config_file"].empty?
+  end
 end
 
 template node["elasticsearch"]["logging_file"] do

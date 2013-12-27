@@ -18,11 +18,6 @@
 #
 
 default["elasticsearch"]["version"] = "0.90.7"
-default["elasticsearch"]["package_provider"] = value_for_platform_family(
-  "debian" => Chef::Provider::Package::Apt,
-  "ubuntu" => Chef::Provider::Package::Apt,
-  "suse" => Chef::Provider::Package::Zypper
-)
 default["elasticsearch"]["package_file"] = value_for_platform_family(
   "debian" => "elasticsearch-#{node["elasticsearch"]["version"]}.deb",
   "ubuntu" => "elasticsearch-#{node["elasticsearch"]["version"]}.deb",
