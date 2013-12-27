@@ -18,22 +18,22 @@
 #
 
 default["elasticsearch"]["version"] = "0.90.7"
-
-case node["platform_family"]
-when "debian"
-  default["elasticsearch"]["download_file"] = "elasticsearch-#{node["elasticsearch"]["version"]}.deb"
-  default["elasticsearch"]["download_url"] = "https://download.elasticsearch.org/elasticsearch/elasticsearch/#{node["elasticsearch"]["download_file"]}"
-  default["elasticsearch"]["sysconfig_file"] = "/etc/default/elasticsearch"
-when "ubuntu"
-  default["elasticsearch"]["download_file"] = "elasticsearch-#{node["elasticsearch"]["version"]}.deb"
-  default["elasticsearch"]["download_url"] = "https://download.elasticsearch.org/elasticsearch/elasticsearch/#{node["elasticsearch"]["download_file"]}"
-  default["elasticsearch"]["sysconfig_file"] = "/etc/default/elasticsearch"
-when "suse"
-  default["elasticsearch"]["download_file"] = "elasticsearch-#{node["elasticsearch"]["version"]}.noarch.rpm"
-  default["elasticsearch"]["download_url"] = "https://download.elasticsearch.org/elasticsearch/elasticsearch/#{node["elasticsearch"]["download_file"]}"
-  default["elasticsearch"]["sysconfig_file"] = "/etc/sysconfig/elasticsearch"
-end
-
+default["elasticsearch"]["package_provider"] = value_for_platform_family(
+  "debian" => Chef::Provider::Package::Apt,
+  "ubuntu" => Chef::Provider::Package::Apt,
+  "suse" => Chef::Provider::Package::Zypper
+)
+default["elasticsearch"]["package_file"] = value_for_platform_family(
+  "debian" => "elasticsearch-#{node["elasticsearch"]["version"]}.deb",
+  "ubuntu" => "elasticsearch-#{node["elasticsearch"]["version"]}.deb",
+  "suse" => "elasticsearch-#{node["elasticsearch"]["version"]}.noarch.rpm"
+)
+default["elasticsearch"]["package_url"] = "https://download.elasticsearch.org/elasticsearch/elasticsearch/#{node["elasticsearch"]["package_file"]}"
+default["elasticsearch"]["sysconfig_file"] = value_for_platform_family(
+  "debian" => "/etc/default/elasticsearch",
+  "ubuntu" => "/etc/default/elasticsearch",
+  "suse" => "/etc/sysconfig/elasticsearch"
+)
 default["elasticsearch"]["service_name"] = "elasticsearch"
 default["elasticsearch"]["config_file"] = "/etc/elasticsearch/elasticsearch.yml"
 default["elasticsearch"]["logging_file"] = "/etc/elasticsearch/logging.yml"

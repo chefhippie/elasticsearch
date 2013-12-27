@@ -19,8 +19,8 @@
 
 include_recipe "java"
 
-remote_file ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["download_file"]) do
-  source node["elasticsearch"]["download_url"]
+remote_file ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["package_file"]) do
+  source node["elasticsearch"]["package_url"]
 
   owner "root"
   group "root"
@@ -28,22 +28,9 @@ remote_file ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["d
   action :create_if_missing
 end
 
-dpkg_package "elasticsearch" do
-  source ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["download_file"])
+package ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["package_file"]) do
+  provider node["elasticsearch"]["package_provider"]
   action :install
-
-  only_if do
-    node["elasticsearch"]["download_file"] =~ /\.deb\z/
-  end
-end
-
-rpm_package "elasticsearch" do
-  source ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["download_file"])
-  action :install
-
-  only_if do
-    node["elasticsearch"]["download_file"] =~ /\.rpm\z/
-  end
 end
 
 template node["elasticsearch"]["sysconfig_file"] do
@@ -57,6 +44,10 @@ template node["elasticsearch"]["sysconfig_file"] do
   )
 
   notifies :restart, "service[elasticsearch]"
+  
+  only_if do
+    node["elasticsearch"]["sysconfig_file"]
+  end
 end
 
 template node["elasticsearch"]["config_file"] do
