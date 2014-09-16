@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-default["elasticsearch"]["version"] = "0.90.7"
+default["elasticsearch"]["version"] = "1.3.2"
 default["elasticsearch"]["package_file"] = value_for_platform_family(
   "debian" => "elasticsearch-#{node["elasticsearch"]["version"]}.deb",
   "ubuntu" => "elasticsearch-#{node["elasticsearch"]["version"]}.deb",
