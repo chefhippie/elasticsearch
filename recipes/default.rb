@@ -29,7 +29,7 @@ remote_file ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["p
 end
 
 case node["platform_family"]
-when "debian", "ubuntu"
+when "debian"
   dpkg_package ::File.join(Chef::Config[:file_cache_path], node["elasticsearch"]["package_file"]) do
     action :install
   end
@@ -50,7 +50,7 @@ template node["elasticsearch"]["sysconfig_file"] do
   )
 
   notifies :restart, "service[elasticsearch]"
-  
+
   not_if do
     node["elasticsearch"]["sysconfig_file"].empty?
   end
@@ -67,7 +67,7 @@ template node["elasticsearch"]["config_file"] do
   )
 
   notifies :restart, "service[elasticsearch]"
-  
+
   not_if do
     node["elasticsearch"]["config_file"].empty?
   end
